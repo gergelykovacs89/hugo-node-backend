@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const _ = require('lodash');
 const bcrypt = require('bcryptjs');
 
-var UserSchema = new mongoose.Schema({
+const UserSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
@@ -34,9 +34,9 @@ var UserSchema = new mongoose.Schema({
 });
 
 UserSchema.methods.generateAuthToken = function () {
-  var user = this;
-  var access = 'auth';
-  var token = jwt.sign({
+    let user = this;
+    const access = 'auth';
+    let token = jwt.sign({
       _id: user._id.toHexString(),
       access: access
   }, process.env.JWT_SECRET).toString();
@@ -52,7 +52,7 @@ UserSchema.methods.generateAuthToken = function () {
 };
 
 UserSchema.methods.removeToken = function (token) {
-    var user = this;
+    let user = this;
     return user.update({
         $pull: {
             tokens: {
@@ -64,16 +64,14 @@ UserSchema.methods.removeToken = function (token) {
 
 
 UserSchema.methods.toJSON = function () {
-    var user = this;
-    var userObject = user.toObject();
+    let user = this;
+    let userObject = user.toObject();
 
     return _.pick(userObject, ['_id', 'email']);
 };
 
 UserSchema.statics.findByCredentials = function (email, password) {
-    var User = this;
-
-
+    let User = this;
 
     return User.findOne({email: email})
         .then((user) => {
@@ -93,8 +91,8 @@ UserSchema.statics.findByCredentials = function (email, password) {
 };
 
 UserSchema.statics.findByToken = function (token) {
-    var User = this;
-    var decoded;
+    let User = this;
+    let decoded;
 
     try {
       decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -110,7 +108,7 @@ UserSchema.statics.findByToken = function (token) {
 };
 
 UserSchema.pre('save', function (next) {
-    var user = this;
+    let user = this;
 
     if (user.isModified('password')) {
         bcrypt.genSalt(10, (err, salt) => {
@@ -125,7 +123,7 @@ UserSchema.pre('save', function (next) {
 
 });
 
-var User = mongoose.model('User', UserSchema);
+const User = mongoose.model('User', UserSchema);
 
 module.exports = {
     User: User
