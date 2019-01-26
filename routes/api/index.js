@@ -24,9 +24,15 @@ router.post('/login', async (req, res) => {
         const body = _.pick(req.body, ['email', 'password']);
         const user = await User.findByCredentials(body.email, body.password);
         const token = await user.generateAuthToken();
-        res.header('x-auth', token).send(user);
+        res.header('x-auth', token).status(200).send({
+            status: 'OK',
+            message: 'logged in',
+            user: user
+        });
     } catch (e) {
-        res.status(400).send();
+        res.status(400).send({
+            status: 'WRONG_PASSWORD'
+        });
     }
 });
 
