@@ -16,6 +16,13 @@ const UserSchema = new mongoose.Schema({
             message: '{VALUE} is not a valid email.'
         }
     },
+    fullName: {
+        type: String,
+        required: false,
+        trim: true,
+        minLength: 1,
+        unique: false,
+    },
     password: {
         type: String,
         required: true,

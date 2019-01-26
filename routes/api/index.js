@@ -6,11 +6,14 @@ const _ = require('lodash');
 
 router.post('/register', async (req, res) => {
     try {
-        const body = _.pick(req.body, ['email', 'password']);
+        const body = _.pick(req.body, ['email', 'password', 'fullName']);
         const user = new User(body);
         await user.save();
         const token = await user.generateAuthToken();
-        res.send();
+        res.send({
+            message: 'Registration was successful.',
+            status: 'OK'
+        });
     } catch (err) {
         res.status(400).send(err);
     }
