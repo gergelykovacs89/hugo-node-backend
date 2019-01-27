@@ -9,7 +9,6 @@ router.post('/register', async (req, res) => {
         const body = _.pick(req.body, ['email', 'password', 'fullName']);
         const user = new User(body);
         await user.save();
-        const token = await user.generateAuthToken();
         res.send({
             message: 'Registration was successful.',
             status: 'OK'
@@ -33,6 +32,18 @@ router.post('/login', async (req, res) => {
         res.status(400).send({
             status: 'WRONG_PASSWORD'
         });
+    }
+});
+
+router.delete('/logout', authenticate, async (req, res) => {
+    try {
+        console.log('delete token try ág');
+        await req.user.removeToken(req.token);
+        res.status(200).send({
+            status: 'LOGGED_OUT'
+        });
+    } catch (e) {
+        res.status(400).send();
     }
 });
 

@@ -33,7 +33,7 @@ const UserSchema = new mongoose.Schema({
             type: String,
             required: true
         },
-        token: {
+        userToken: {
             type: String,
             required: true
         }
@@ -43,27 +43,27 @@ const UserSchema = new mongoose.Schema({
 UserSchema.methods.generateAuthToken = function () {
     let user = this;
     const access = 'auth';
-    let token = jwt.sign({
+    let userToken = jwt.sign({
       _id: user._id.toHexString(),
       access: access
   }, process.env.JWT_SECRET).toString();
 
   user.tokens = user.tokens.concat({
       access: access,
-      token: token
+      userToken: userToken
   });
 
   return user.save().then(() => {
-      return token;
+      return userToken;
   });
 };
 
-UserSchema.methods.removeToken = function (token) {
+UserSchema.methods.removeToken = function (userToken) {
     let user = this;
     return user.update({
         $pull: {
             tokens: {
-                token: token
+                userToken: userToken
             }
         }
     });
@@ -73,8 +73,10 @@ UserSchema.methods.removeToken = function (token) {
 UserSchema.methods.toJSON = function () {
     let user = this;
     let userObject = user.toObject();
-
-    return _.pick(userObject, ['_id', 'email']);
+    let userToken = _.get(userObject, 'tokens[0].userToken');
+    user = _.pick(userObject, ['_id', 'email']);
+    user.userToken = userToken;
+    return user;
 };
 
 UserSchema.statics.findByCredentials = function (email, password) {
@@ -100,16 +102,14 @@ UserSchema.statics.findByCredentials = function (email, password) {
 UserSchema.statics.findByToken = function (token) {
     let User = this;
     let decoded;
-
     try {
       decoded = jwt.verify(token, process.env.JWT_SECRET);
     } catch (e) {
         return Promise.reject();
     }
-
     return User.findOne({
         '_id': decoded._id,
-        'tokens.token': token,
+        'tokens.userToken': token,
         'tokens.access': 'auth'
     });
 };
