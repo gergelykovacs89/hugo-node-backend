@@ -28,16 +28,28 @@ const UserSchema = new mongoose.Schema({
         required: true,
         minLength: 6,
     },
-    tokens: [{
-        access: {
-            type: String,
-            required: true
+    tokens: [
+        {
+            access: {
+                type: String,
+                required: true
+            },
+            userToken: {
+                type: String,
+                required: true
+            }
         },
-        userToken: {
-            type: String,
-            required: true
+        {
+            access: {
+                type: String,
+                required: true
+            },
+            authorToken: {
+                type: String,
+                required: true
+            }
         }
-    }]
+        ]
 });
 
 UserSchema.methods.generateAuthToken = function () {
@@ -64,6 +76,17 @@ UserSchema.methods.removeToken = function (userToken) {
         $pull: {
             tokens: {
                 userToken: userToken
+            }
+        }
+    });
+};
+
+UserSchema.methods.removeAuthorToken = function (authorToken) {
+    let user = this;
+    return user.update({
+        $pull: {
+            tokens: {
+                authorToken: authorToken
             }
         }
     });
