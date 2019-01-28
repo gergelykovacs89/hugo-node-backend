@@ -65,6 +65,23 @@ router.post('/new-author', authenticate, async (req, res) => {
 });
 
 
+router.put('/update-author', authenticate, async (req, res) => {
+    try {
+        const body = _.pick(req.body, ['_id', 'name', 'description', 'imgPath']);
+        let authorUpdated = await Author.findOneAndUpdate({_id: body._id}, {$set:{imgPath: body.imgPath, description: body.description}}, {new: true});
+        if (!authorUpdated) {
+            return res.status(404).send({message: 'author not found'});
+        } else {
+            return res.header('x-auth', req.token).status(200).send(authorUpdated);
+        }
+    } catch (e) {
+        res.status(400).send({
+            status: 'Somethign went wrong...'
+        });
+    }
+});
+
+
 router.get('/user-authors', authenticate, async (req, res) => {
     try {
         let authors = await Author.findByUserId(req.user._id);
