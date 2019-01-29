@@ -38,7 +38,8 @@ const UserSchema = new mongoose.Schema({
                 type: String,
                 required: true
             }
-        },
+        }],
+    authorTokens: [
         {
             access: {
                 type: String,
@@ -49,7 +50,7 @@ const UserSchema = new mongoose.Schema({
                 required: true
             }
         }
-        ]
+    ]
 });
 
 UserSchema.methods.generateAuthToken = function () {
@@ -70,6 +71,23 @@ UserSchema.methods.generateAuthToken = function () {
   });
 };
 
+UserSchema.methods.generateAuthorAuthToken = function (authorId) {
+    let user = this;
+    const access = 'authAuth';
+    let authorToken = jwt.sign({
+        _id: authorId.toHexString(),
+        access: access
+    }, process.env.JWT_SECRET).toString();
+
+    user.authorTokens = user.authorTokens.concat({
+        access: access,
+        authorToken: authorToken
+    });
+    return user.save().then(() => {
+        return authorToken;
+    });
+};
+
 UserSchema.methods.removeToken = function (userToken) {
     let user = this;
     return user.update({
@@ -85,7 +103,7 @@ UserSchema.methods.removeAuthorToken = function (authorToken) {
     let user = this;
     return user.update({
         $pull: {
-            tokens: {
+            authorTokens: {
                 authorToken: authorToken
             }
         }

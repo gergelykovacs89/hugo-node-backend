@@ -28,6 +28,7 @@ const AuthorSchema = new mongoose.Schema({
     },
     _userId: {
         type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
         required: true
     }
 });
