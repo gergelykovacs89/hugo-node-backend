@@ -30,7 +30,21 @@ const AuthorSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true
-    }
+    },
+    followers: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Author',
+            required: true
+        }
+    ],
+    following: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Author',
+            required: true
+        }
+    ]
 });
 
 AuthorSchema.methods.generateAuthToken = async function () {
@@ -61,7 +75,7 @@ AuthorSchema.methods.generateAuthToken = async function () {
 AuthorSchema.methods.toJSON = function () {
     let author = this;
     let userObject = author.toObject();
-    author = _.pick(userObject, ['_id', 'name', 'description', 'imgPath']);
+    author = _.pick(userObject, ['_id', 'name', 'description', 'imgPath', 'followers', 'following']);
     return author;
 };
 

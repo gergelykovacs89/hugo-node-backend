@@ -161,4 +161,45 @@ router.get('/user-authors', authenticate, async (req, res) => {
     }
 });
 
+router.post('/follow-author', authenticate, async (req, res) => {
+    try {
+        const body = _.pick(req.body, ['authorSelfId', 'authorToFollowId']);
+        const authorSelfId = body.authorSelfId;
+        const authorToFollowId = body.authorToFollowId;
+        console.log(ObjectID.isValid(authorSelfId));
+        console.log(ObjectID.isValid(authorToFollowId));
+        await Author.updateOne({_id: authorSelfId}, {$push: {following: authorToFollowId}});
+        await Author.updateOne({_id: authorToFollowId}, {$push: {followers: authorSelfId}});
+
+        res.header('x-auth', req.token).status(200).send({
+            message: `UPDATED`
+        });
+    } catch (e) {
+        res.status(400).send({
+            status: 'Somethign went wrong...'
+        });
+    }
+});
+
+router.post('/unfollow-author', authenticate, async (req, res) => {
+    try {
+        const body = _.pick(req.body, ['authorSelfId', 'authorToUnfollowId']);
+        const authorSelfId = body.authorSelfId;
+        const authorToUnfollowId = body.authorToUnfollowId;
+        console.log(ObjectID.isValid(authorSelfId));
+        console.log(ObjectID.isValid(authorToUnfollowId));
+        Author.updateOne({_id: authorSelfId}, {$pull: {following: authorToUnfollowId}})
+            .then((res,err) => console.log(res, err));
+        await Author.updateOne({_id: authorToUnfollowId}, {$pull: {followers: authorSelfId}});
+
+        res.header('x-auth', req.token).status(200).send({
+            message: `UPDATED`
+        });
+    } catch (e) {
+        res.status(400).send({
+            status: 'Somethign went wrong...'
+        });
+    }
+});
+
 module.exports = router;
