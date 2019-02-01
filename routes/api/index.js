@@ -43,6 +43,10 @@ router.post('/login', async (req, res) => {
 router.delete('/logout', authenticate, async (req, res) => {
     try {
         await req.user.removeToken(req.token);
+        if (req.headers['authauth'] !== '') {
+            console.log(req.headers['authauth']);
+            await req.user.removeAuthorToken(req.headers['authauth']);
+        }
         res.status(200).send({
             status: 'LOGGED_OUT'
         });
@@ -114,9 +118,10 @@ router.get('/get-author-by-id', authenticate, async (req, res) => {
 });
 
 
-router.delete('/logout-author', authenticate, async (req, res) => {
+router.delete('/logout-author', authenticate, (req, res) => {
     try {
-        await req.user.removeAuthorToken(req.token);
+        req.user.removeAuthorToken(req.headers['authortoken'])
+            .then(res => console.log(res));
         res.status(200).send({
             status: 'AUTHOR_LOGGED_OUT'
         });
@@ -166,8 +171,6 @@ router.post('/follow-author', authenticate, async (req, res) => {
         const body = _.pick(req.body, ['authorSelfId', 'authorToFollowId']);
         const authorSelfId = body.authorSelfId;
         const authorToFollowId = body.authorToFollowId;
-        console.log(ObjectID.isValid(authorSelfId));
-        console.log(ObjectID.isValid(authorToFollowId));
         await Author.updateOne({_id: authorSelfId}, {$push: {following: authorToFollowId}});
         await Author.updateOne({_id: authorToFollowId}, {$push: {followers: authorSelfId}});
 
@@ -186,8 +189,6 @@ router.post('/unfollow-author', authenticate, async (req, res) => {
         const body = _.pick(req.body, ['authorSelfId', 'authorToUnfollowId']);
         const authorSelfId = body.authorSelfId;
         const authorToUnfollowId = body.authorToUnfollowId;
-        console.log(ObjectID.isValid(authorSelfId));
-        console.log(ObjectID.isValid(authorToUnfollowId));
         Author.updateOne({_id: authorSelfId}, {$pull: {following: authorToUnfollowId}})
             .then((res,err) => console.log(res, err));
         await Author.updateOne({_id: authorToUnfollowId}, {$pull: {followers: authorSelfId}});
