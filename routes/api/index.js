@@ -6,62 +6,55 @@ const { User } = require("../../models/user");
 const { Author } = require("../../models/author");
 const { authenticate } = require("../../middleware/authenticate");
 const _ = require("lodash");
+const validateRegisterInput = require("../../validation/register");
+const validateLoginInput = require("../../validation/login");
 
 router.post("/register", async (req, res) => {
+  const { errors, isValid } = validateRegisterInput(req.body);
+  if (!isValid) {
+    return res.status(400).json(errors);
+  }
   try {
-    const body = _.pick(req.body, ["email", "password", "fullName"]);
-    const user = new User(body);
-    await user.save();
-    res.send({
-      message: "Registration was successful.",
-      status: "OK"
+    const user = await User.findOne({
+      email: req.body.email
     });
-  } catch (err) {
-    if (err.name === "MongoError" && err.code === 11000) {
-      res.status(409).send({
-        error: "Duplicate key",
-        message: [err.message]
-      });
+    if (user) {
+      errors.email = "Email already exists";
+      return res.status(400).json(errors);
     } else {
-      res.status(500).send(err);
+      const body = _.pick(req.body, ["email", "password", "fullName"]);
+      const user = new User(body);
+      await user.save();
+      res.send({
+        message: "Registration was successful.",
+        status: "OK"
+      });
     }
+  } catch (err) {
+    res.status(400).send(err);
   }
 });
 
 router.post("/login", async (req, res) => {
+  const { errors, isValid } = validateLoginInput(req.body);
+  if (!isValid) {
+    return res.status(400).json(errors);
+  }
   try {
     const body = _.pick(req.body, ["email", "password"]);
     const user = await User.findByCredentials(body.email, body.password);
     const userToken = await user.generateAuthToken();
     const authors = await Author.findByUserId(user._id);
     res
-      .header("x-auth", userToken)
       .status(200)
       .send({
         status: "OK",
         message: "logged in",
-        user: user,
-        authors: authors
+        authors: authors,
+        jwtToken: userToken
       });
   } catch (e) {
-    res.status(400).send({
-      status: "WRONG_PASSWORD"
-    });
-  }
-});
-
-router.delete("/logout", authenticate, async (req, res) => {
-  try {
-    await req.user.removeToken(req.token);
-    if (req.headers["authauth"] !== "") {
-      console.log(req.headers["authauth"]);
-      await req.user.removeAuthorToken(req.headers["authauth"]);
-    }
-    res.status(200).send({
-      status: "LOGGED_OUT"
-    });
-  } catch (e) {
-    res.status(400).send();
+    res.status(400).send(e);
   }
 });
 
