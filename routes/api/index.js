@@ -41,19 +41,16 @@ router.post("/login", async (req, res) => {
     return res.status(400).json(errors);
   }
   try {
-   
     const body = _.pick(req.body, ["email", "password"]);
     const user = await User.findByCredentials(body.email, body.password);
     const userToken = await user.generateAuthToken();
     const authors = await Author.findByUserId(user._id);
-    res
-      .status(200)
-      .send({
-        status: "OK",
-        message: "logged in",
-        authors: authors,
-        jwtToken: userToken
-      });
+    res.status(200).send({
+      status: "OK",
+      message: "logged in",
+      authors: authors,
+      jwtToken: userToken
+    });
   } catch (e) {
     res.status(400).send(e);
   }
@@ -190,11 +187,15 @@ router.get("/get-author-by-token", authenticate, async (req, res) => {
 
 router.get("/user-authors", authenticate, async (req, res) => {
   try {
+    const userToken = await req.user.generateAuthToken();
     let authors = await Author.findByUserId(req.user._id);
     res
       .header("x-auth", req.token)
       .status(200)
-      .send(authors);
+      .send({
+        authors: authors,
+        jwtToken: userToken
+      });
   } catch (e) {
     res.status(400).send({
       status: "Somethign went wrong..."
