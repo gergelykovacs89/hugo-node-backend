@@ -19,6 +19,7 @@
     "cors": "^2.8.5",
     "crypto-js": "^3.1.9-1",
     "express": "^4.16.4",
+    "is-image-url": "^1.1.8",
     "jsonwebtoken": "^8.4.0",
     "lodash": "^4.17.11",
     "mongodb": "^3.1.10",

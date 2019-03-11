@@ -8,6 +8,7 @@ const { authenticate } = require("../../middleware/authenticate");
 const _ = require("lodash");
 const validateRegisterInput = require("../../validation/register");
 const validateLoginInput = require("../../validation/login");
+const validateCreateAuthorInput = require("../../validation/createAuthor");
 
 router.post("/register", async (req, res) => {
   const { errors, isValid } = validateRegisterInput(req.body);
@@ -57,6 +58,11 @@ router.post("/login", async (req, res) => {
 });
 
 router.post("/new-author", authenticate, async (req, res) => {
+  const { errors, isValid } = validateCreateAuthorInput(req.body);
+  console.log(errors);
+  if (!isValid) {
+    return res.status(400).json(errors);
+  }
   try {
     const body = _.pick(req.body, ["name", "description", "imgPath"]);
     let author = new Author(body);
