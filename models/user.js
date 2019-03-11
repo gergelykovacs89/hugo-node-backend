@@ -37,7 +37,7 @@ UserSchema.methods.generateAuthToken = function() {
     .sign(
       {
         _id: user._id.toHexString(),
-        name: user.email,
+        email: user.email,
         access: access
       },
       process.env.JWT_SECRET
@@ -45,8 +45,6 @@ UserSchema.methods.generateAuthToken = function() {
     .toString();
   return userToken;
 };
-
-
 
 UserSchema.methods.removeToken = function(userToken) {
   let user = this;
