@@ -53,7 +53,8 @@ router.post("/login", async (req, res) => {
       jwtToken: userToken
     });
   } catch (e) {
-    res.status(400).send(e);
+    errors.email = e;
+    res.status(400).json(errors);
   }
 });
 
@@ -114,12 +115,10 @@ router.delete("/delete-author/:id", authenticate, async (req, res) => {
     if (!authorRemoved) {
       return res.status(404).send({ message: "author not found" });
     } else {
-      return res
-        .status(200)
-        .send({
-          message: `${authorRemoved.name} was deleted ok`,
-          status: "DELETED"
-        });
+      return res.status(200).send({
+        message: `${authorRemoved.name} was deleted ok`,
+        status: "DELETED"
+      });
     }
   } catch (e) {
     res.status(400).send({

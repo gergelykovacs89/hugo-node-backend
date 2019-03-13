@@ -82,12 +82,12 @@ UserSchema.statics.findByCredentials = function(email, password) {
 
   return User.findOne({ email: email }).then(user => {
     if (!user) {
-      return Promise.reject();
+      return Promise.reject("Email and/or password incorrect");
     }
     return new Promise((resolve, reject) => {
       bcrypt.compare(password, user.password, (err, res) => {
         if (!res) {
-          reject();
+          reject("Email and/or password incorrect");
         } else {
           resolve(user);
         }
