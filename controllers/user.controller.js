@@ -24,7 +24,7 @@ exports.registerUser = async function(req, res) {
   }
 };
 
-exports.loginUser = async function(req, res) {
+exports.loginUser = async function(req, res, errors) {
   try {
     const body = _.pick(req.body, ["email", "password"]);
     const user = await User.findByCredentials(body.email, body.password);
@@ -38,6 +38,7 @@ exports.loginUser = async function(req, res) {
     });
   } catch (e) {
     errors.email = e;
+    console.log(e);
     res.status(400).json(errors);
   }
 };

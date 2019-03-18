@@ -18,7 +18,7 @@ router.post("/login", async (req, res) => {
   if (!isValid) {
     return res.status(400).json(errors);
   }
-  UserController.loginUser(req, res);
+  UserController.loginUser(req, res, errors);
 });
 
 module.exports = router;
