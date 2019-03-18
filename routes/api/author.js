@@ -28,6 +28,10 @@ router.get("/get-author/:id", authenticate, async (req, res) => {
   AuthorController.getAuthorById(req, res);
 });
 
+router.get("/get-author-detail/:id", async (req, res) => {
+  AuthorController.getAuthorDetail(req, res);
+});
+
 router.get("/user-authors", authenticate, async (req, res) => {
   AuthorController.getAuthorsByUserId(req, res);
 });

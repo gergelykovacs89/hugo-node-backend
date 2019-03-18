@@ -77,16 +77,28 @@ exports.getAuthorById = async function(req, res) {
   }
 };
 
+exports.getAuthorDetail = async function(req, res) {
+  try {
+    let authorId = req.params.id;
+    let author = await Author.findOne({
+      _id: authorId
+    });
+    res.status(200).send({ author });
+  } catch (e) {
+    res.status(400).send({
+      status: "Somethign went wrong..."
+    });
+  }
+};
+
 exports.getAuthorsByUserId = async function(req, res) {
   try {
     const userToken = await req.user.generateAuthToken();
     let authors = await Author.findByUserId(req.user._id);
-    res
-      .status(200)
-      .send({
-        authors: authors,
-        jwtToken: userToken
-      });
+    res.status(200).send({
+      authors: authors,
+      jwtToken: userToken
+    });
   } catch (e) {
     res.status(400).send({
       status: "Somethign went wrong..."
@@ -95,53 +107,49 @@ exports.getAuthorsByUserId = async function(req, res) {
 };
 
 exports.followAuthor = async function(req, res) {
-    try {
-        const body = _.pick(req.body, ["authorSelfId", "authorToFollowId"]);
-        const authorSelfId = body.authorSelfId;
-        const authorToFollowId = body.authorToFollowId;
-        await Author.updateOne(
-          { _id: authorSelfId },
-          { $push: { following: authorToFollowId } }
-        );
-        await Author.updateOne(
-          { _id: authorToFollowId },
-          { $push: { followers: authorSelfId } }
-        );
-    
-        res
-          .status(200)
-          .send({
-            message: `UPDATED`
-          });
-      } catch (e) {
-        res.status(400).send({
-          status: "Somethign went wrong..."
-        });
-      }
-}
+  try {
+    const body = _.pick(req.body, ["authorSelfId", "authorToFollowId"]);
+    const authorSelfId = body.authorSelfId;
+    const authorToFollowId = body.authorToFollowId;
+    await Author.updateOne(
+      { _id: authorSelfId },
+      { $push: { following: authorToFollowId } }
+    );
+    await Author.updateOne(
+      { _id: authorToFollowId },
+      { $push: { followers: authorSelfId } }
+    );
+
+    res.status(200).send({
+      message: `UPDATED`
+    });
+  } catch (e) {
+    res.status(400).send({
+      status: "Somethign went wrong..."
+    });
+  }
+};
 
 exports.unFollowAuthor = async function(req, res) {
-    try {
-        const body = _.pick(req.body, ["authorSelfId", "authorToUnfollowId"]);
-        const authorSelfId = body.authorSelfId;
-        const authorToUnfollowId = body.authorToUnfollowId;
-        Author.updateOne(
-          { _id: authorSelfId },
-          { $pull: { following: authorToUnfollowId } }
-        ).then((res, err) => console.log(res, err));
-        await Author.updateOne(
-          { _id: authorToUnfollowId },
-          { $pull: { followers: authorSelfId } }
-        );
-    
-        res
-          .status(200)
-          .send({
-            message: `UPDATED`
-          });
-      } catch (e) {
-        res.status(400).send({
-          status: "Somethign went wrong..."
-        });
-      }
-}
+  try {
+    const body = _.pick(req.body, ["authorSelfId", "authorToUnfollowId"]);
+    const authorSelfId = body.authorSelfId;
+    const authorToUnfollowId = body.authorToUnfollowId;
+    Author.updateOne(
+      { _id: authorSelfId },
+      { $pull: { following: authorToUnfollowId } }
+    ).then((res, err) => console.log(res, err));
+    await Author.updateOne(
+      { _id: authorToUnfollowId },
+      { $pull: { followers: authorSelfId } }
+    );
+
+    res.status(200).send({
+      message: `UPDATED`
+    });
+  } catch (e) {
+    res.status(400).send({
+      status: "Somethign went wrong..."
+    });
+  }
+};
