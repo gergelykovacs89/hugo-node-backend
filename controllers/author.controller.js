@@ -68,7 +68,6 @@ exports.getAuthorById = async function(req, res) {
       _id: authorId,
       _userId: req.user._id
     });
-    let user = await User.findById(req.user._id);
     res.status(200).send({ author });
   } catch (e) {
     res.status(400).send({
@@ -108,8 +107,8 @@ exports.getAuthorsByUserId = async function(req, res) {
 
 exports.followAuthor = async function(req, res) {
   try {
-    const body = _.pick(req.body, ["authorSelfId", "authorToFollowId"]);
-    const authorSelfId = body.authorSelfId;
+    const body = _.pick(req.body, ["selectAuthorId", "authorToFollowId"]);
+    const authorSelfId = body.selectAuthorId;
     const authorToFollowId = body.authorToFollowId;
     await Author.updateOne(
       { _id: authorSelfId },
@@ -132,13 +131,14 @@ exports.followAuthor = async function(req, res) {
 
 exports.unFollowAuthor = async function(req, res) {
   try {
-    const body = _.pick(req.body, ["authorSelfId", "authorToUnfollowId"]);
-    const authorSelfId = body.authorSelfId;
-    const authorToUnfollowId = body.authorToUnfollowId;
-    Author.updateOne(
+    const body = _.pick(req.body, ["selectAuthorId", "authorToUnFollowId"]);
+    
+    const authorSelfId = body.selectAuthorId;
+    const authorToUnfollowId = body.authorToUnFollowId;
+    await Author.updateOne(
       { _id: authorSelfId },
       { $pull: { following: authorToUnfollowId } }
-    ).then((res, err) => console.log(res, err));
+    );
     await Author.updateOne(
       { _id: authorToUnfollowId },
       { $pull: { followers: authorSelfId } }

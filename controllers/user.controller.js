@@ -38,7 +38,6 @@ exports.loginUser = async function(req, res, errors) {
     });
   } catch (e) {
     errors.email = e;
-    console.log(e);
     res.status(400).json(errors);
   }
 };
