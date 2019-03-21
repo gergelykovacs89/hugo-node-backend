@@ -16,4 +16,8 @@ router.get("/story-roots/:id", authenticate, async (req, res) => {
   StoryRootController.getRootsByAuthorId(req, res);
 });
 
+router.get("/root/:id", authenticate, async (req, res) => {
+    StoryRootController.getRootById(req, res);
+  });
+
 module.exports = router;

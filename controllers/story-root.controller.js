@@ -34,3 +34,15 @@ exports.getRootsByAuthorId = async function(req, res) {
     });
   }
 };
+
+exports.getRootById = async function(req, res) {
+  try {
+    let storyRootId = req.params.id;
+    const root = await StoryRoot.findById(storyRootId);
+    res.status(200).send(root);
+  } catch (e) {
+    res.status(400).send({
+      status: "Somethign went wrong..."
+    });
+  }
+};
