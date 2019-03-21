@@ -1,4 +1,3 @@
-const { User } = require("../models/user");
 const { Author } = require("../models/author");
 const _ = require("lodash");
 
@@ -9,7 +8,6 @@ exports.addAuthor = async function(req, res) {
     author._userId = req.user._id;
     author = await author.save();
     res
-      .header("x-auth", req.token)
       .status(200)
       .send(author);
   } catch (e) {
