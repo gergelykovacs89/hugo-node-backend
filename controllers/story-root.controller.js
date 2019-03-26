@@ -41,8 +41,7 @@ exports.getRootById = async function(req, res) {
     let storyRootId = req.params.id;
     const root = await StoryRoot.findById(storyRootId);
     const author = await Author.findById(root._authorId);
-    const rootText = await Text.findById(root._rootTextId);
-    res.status(200).send({ root, author, rootText });
+    res.status(200).send({ root, author });
   } catch (e) {
     res.status(400).send({
       status: "Somethign went wrong..."
