@@ -24,6 +24,43 @@ exports.createRoot = async function(req, res) {
   }
 };
 
+exports.updateRoot = async function(req, res) {
+  try {
+    let storyRootBody = _.pick(req.body, [
+      "title",
+      "summary",
+      "imgPath",
+      "_authorId"
+    ]);
+
+    let storyRootUpdated = await StoryRoot.findOneAndUpdate(
+      { _id: req.params.id },
+      {
+        $set: {
+          imgPath: storyRootBody.imgPath,
+          summary: storyRootBody.summary,
+          title: storyRootBody.title
+        }
+      },
+      { new: true }
+    );
+    let textUpdated = await Text.findOneAndUpdate(
+      { _id: req.body.textId },
+      {
+        $set: {
+          text: req.body.text
+        }
+      },
+      { new: true }
+    );
+    res.status(200).send({ storyRootUpdated, textUpdated });
+  } catch (e) {
+    res.status(400).send({
+      status: "Somethign went wrong..."
+    });
+  }
+};
+
 exports.getRootsByAuthorId = async function(req, res) {
   try {
     let authorId = req.params.id;

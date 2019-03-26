@@ -17,7 +17,15 @@ router.get("/story-roots/:id", authenticate, async (req, res) => {
 });
 
 router.get("/root/:id", authenticate, async (req, res) => {
-    StoryRootController.getRootById(req, res);
-  });
+  StoryRootController.getRootById(req, res);
+});
+
+router.put("/update/:id", authenticate, async (req, res) => {
+  const { errors, isValid } = validateCreateStoryInput(req.body);
+  if (!isValid) {
+    return res.status(400).json(errors);
+  }
+  StoryRootController.updateRoot(req, res);
+});
 
 module.exports = router;
