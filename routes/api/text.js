@@ -8,7 +8,15 @@ router.get("/:id", authenticate, async (req, res) => {
 });
 
 router.put("/update/:id", authenticate, async (req, res) => {
-    TextController.updateById(req, res);
-  });
+  TextController.updateById(req, res);
+});
+
+router.post("/fork", authenticate, async (req, res) => {
+  TextController.createTextFromParent(req, res);
+});
+
+router.delete("/delete/:id", authenticate, async (req, res) => {
+  TextController.deleteTextById(req, res);
+});
 
 module.exports = router;
