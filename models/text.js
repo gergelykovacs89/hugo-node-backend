@@ -12,19 +12,17 @@ const TextSchema = new mongoose.Schema({
     ref: "Author",
     required: true
   },
-  _childTextIds: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Text",
-      required: true
-    }
-  ]
+  _parentTextId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Text",
+    required: true
+  }
 });
 
 TextSchema.methods.toJSON = function() {
   let text = this;
   let textObject = text.toObject();
-  text = _.pick(textObject, ["_id", "text", "_authorId", "_childTextIds"]);
+  text = _.pick(textObject, ["_id", "text", "_authorId", "_parentTextId"]);
   return text;
 };
 
