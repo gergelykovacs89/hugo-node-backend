@@ -52,7 +52,9 @@ exports.updateRoot = async function(req, res) {
         }
       },
       { new: true }
-    );
+    ).lean();
+    let author = await Author.findById(textUpdated._authorId).lean();
+    textUpdated.author = author;
     res.status(200).send({ storyRootUpdated, textUpdated });
   } catch (e) {
     res.status(400).send({

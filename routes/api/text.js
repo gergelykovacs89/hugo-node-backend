@@ -19,4 +19,8 @@ router.delete("/delete/:id", authenticate, async (req, res) => {
   TextController.deleteTextById(req, res);
 });
 
+router.get("/children/:id", authenticate, async (req, res) => {
+  TextController.getTextsByParentId(req, res);
+});
+
 module.exports = router;
