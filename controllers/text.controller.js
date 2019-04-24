@@ -94,3 +94,18 @@ exports.getTextsByParentId = async function(req, res) {
     });
   }
 };
+
+exports.getTextsByAuthorId = async function(req, res) {
+  try {
+    const _authorId = req.params.id;
+    let authorTexts = await Text.find({
+      _authorId,
+      _parentTextId: { $ne: null }
+    }).populate(populateTextWithAuthor);
+    res.status(200).send({ authorTexts });
+  } catch (e) {
+    res.status(400).send({
+      status: "Somethign went wrong..."
+    });
+  }
+};

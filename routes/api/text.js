@@ -23,4 +23,8 @@ router.get("/children/:id", authenticate, async (req, res) => {
   TextController.getTextsByParentId(req, res);
 });
 
+router.get("/author/:id", authenticate, async (req, res) => {
+  TextController.getTextsByAuthorId(req, res);
+});
+
 module.exports = router;
